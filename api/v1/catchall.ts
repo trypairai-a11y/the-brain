@@ -68,10 +68,19 @@ function getApp(): Promise<ReadyApp> {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const app = await getApp();
+    // content-length describes the ORIGINAL raw body. inject() re-serializes
+    // req.body (parsed by @vercel/node), and multibyte content (Arabic) can
+    // change the byte count, tripping FST_ERR_CTP_INVALID_CONTENT_LENGTH.
+    // Drop it (and transfer-encoding) so inject computes the real length.
+    const {
+      "content-length": _contentLength,
+      "transfer-encoding": _transferEncoding,
+      ...headers
+    } = req.headers;
     const result = await app.inject({
       method: req.method ?? "GET",
       url: req.url ?? "/",
-      headers: req.headers,
+      headers,
       payload: req.body,
     });
     for (const [k, v] of Object.entries(result.headers)) {
