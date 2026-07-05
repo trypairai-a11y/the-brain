@@ -74,6 +74,8 @@ model Tenant {
   activityFeed        ActivityFeedEvent[]
   importLogs          ImportLog[]
   contentAnalytics    ContentAnalyticsEvent[]
+  entityLinks         EntityLink[]
+  entityEvents        EntityEvent[]
 
   @@map("tenants")
 }
@@ -139,6 +141,9 @@ model Entry {
   versions      EntryVersion[]
   analytics     ContentAnalyticsEvent[]
   scheduledJobs ScheduledJob[]
+  linksFrom     EntityLink[]  @relation("LinkFrom")
+  linksTo       EntityLink[]  @relation("LinkTo")
+  events        EntityEvent[]
 
   @@unique([tenantId, moduleId, externalId])
   @@index([tenantId, moduleId, status, updatedAt(sort: Desc)])
@@ -357,4 +362,41 @@ model MigrationDiff {
 
   @@index([tenantId, createdAt])
   @@map("migration_diffs")
+}
+
+model EntityLink {
+  id          String   @id @default(uuid()) @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
+  fromEntryId String   @map("from_entry_id") @db.Uuid
+  toEntryId   String   @map("to_entry_id") @db.Uuid
+  edgeType    String   @map("edge_type")
+  createdBy   String?  @map("created_by") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  fromEntry   Entry    @relation("LinkFrom", fields: [fromEntryId], references: [id], onDelete: Cascade)
+  toEntry     Entry    @relation("LinkTo", fields: [toEntryId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, fromEntryId, toEntryId, edgeType])
+  @@index([tenantId, fromEntryId])
+  @@index([tenantId, toEntryId])
+  @@map("entity_links")
+}
+
+model EntityEvent {
+  id         String   @id @default(uuid()) @db.Uuid
+  tenantId   String   @map("tenant_id") @db.Uuid
+  entryId    String   @map("entry_id") @db.Uuid
+  eventType  String   @map("event_type")
+  occurredAt DateTime @map("occurred_at")
+  note       String?
+  createdBy  String?  @map("created_by") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entry      Entry    @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, entryId, occurredAt(sort: Desc)])
+  @@index([tenantId, occurredAt(sort: Desc)])
+  @@map("entity_events")
 }

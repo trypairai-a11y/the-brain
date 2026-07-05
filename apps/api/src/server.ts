@@ -34,6 +34,7 @@ import voiceRoutes from "./routes/voice.js";
 import mediaRoutes from "./routes/media.js";
 import meRoutes from "./routes/me.js";
 import translateRoutes from "./routes/translate.js";
+import opsRoutes from "./routes/ops.js";
 
 export async function buildApp() {
   initSentry(env.SENTRY_DSN, env.NODE_ENV);
@@ -182,6 +183,7 @@ export async function buildApp() {
   await app.register(mediaRoutes, { prefix: "/api/v1/media" });
   await app.register(meRoutes, { prefix: "/api/v1/me" });
   await app.register(translateRoutes, { prefix: "/api/v1/translate" });
+  await app.register(opsRoutes, { prefix: "/api/v1/ops" });
 
   return app;
 }
