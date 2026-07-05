@@ -52,6 +52,15 @@ Links and events live in two tenant-scoped tables added for this layer:
 The ops layer auto-provisions three modules on first use: `conversations`,
 `customers`, `inbox`.
 
+## Agent skills
+
+`skills/` at the repo root teaches agents (FAI) when to call which operation:
+a thin `RESOLVER.md` routing table plus one skill file per workflow
+(answer-question, customer-context, file-conversation, handle-complaint,
+record-facts, owner-briefing) and a shared `_api.md` connection reference.
+Load `RESOLVER.md` into the agent's system context; it reads skill files on
+demand.
+
 ## Known limits
 
 - Retrieval is keyword-only (pg_trgm + ILIKE). Arabic morphology is not handled:
