@@ -19,7 +19,7 @@
     "@aws-sdk/client-s3": "^3.600.0",
     "@aws-sdk/s3-request-presigner": "^3.600.0",
     "@react-pdf/renderer": "^3.4.0",
-    "nodemailer": "^7.0.11",
+    "nodemailer": "^9.0.3",
     "openai": "^4.47.0",
     "@brain/prompts": "workspace:*",
     "@brain/shared": "workspace:*",
