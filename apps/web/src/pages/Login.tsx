@@ -5,7 +5,6 @@ import { useAuth } from "../state/auth.js";
 export function Login() {
   const setAuth = useAuth((s) => s.setAuth);
   const nav = useNavigate();
-  const [tenantSlug, setTenantSlug] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
@@ -22,7 +21,7 @@ export function Login() {
       const resp = await fetch("/api/v1/auth/login", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(override ?? { tenantSlug, email, password }),
+        body: JSON.stringify(override ?? { tenantSlug: "flare-fitness", email, password }),
       });
       const json = await resp.json();
       if (!resp.ok || !json.success) throw new Error(json.error?.message ?? "Login failed");
@@ -52,9 +51,7 @@ export function Login() {
           <h1 className="text-[24px] sm:text-[28px] font-semibold tracking-[-0.02em] text-apple-text">
             The Brain
           </h1>
-          <p className="text-[14px] text-apple-secondary mt-1">
-            AI-native knowledge hub for your business
-          </p>
+          <p className="text-[14px] text-apple-secondary mt-1">Flare Fitness knowledge hub</p>
         </div>
 
         <div className="card p-6 space-y-5">
@@ -77,16 +74,6 @@ export function Login() {
           </div>
 
           <form onSubmit={(e) => submit(e)} noValidate className="space-y-3">
-            <div>
-              <span className="label">Company</span>
-              <input
-                className="input-apple"
-                value={tenantSlug}
-                onChange={(e) => setTenantSlug(e.target.value)}
-                autoComplete="organization"
-                placeholder="your-company"
-              />
-            </div>
             <div>
               <span className="label">Email</span>
               <input
