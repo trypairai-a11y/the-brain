@@ -39,7 +39,7 @@
     "fastify": "^4.27.0",
     "fastify-plugin": "^4.5.1",
     "ioredis": "^5.4.1",
-    "nanoid": "^5.0.7",
+    "nanoid": "^5.1.16",
     "pino": "^9.1.0",
     "prom-client": "^15.1.0",
     "zod": "^3.23.8"
