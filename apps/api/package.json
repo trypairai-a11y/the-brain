@@ -33,7 +33,7 @@
     "@fastify/swagger": "^8.14.0",
     "@fastify/swagger-ui": "^4.0.0",
     "fastify-type-provider-zod": "^2.0.0",
-    "@prisma/client": "^5.14.0",
+    "@prisma/client": "^7.8.0",
     "@sentry/node": "^8.0.0",
     "bcryptjs": "^2.4.3",
     "fastify": "^4.27.0",
