@@ -9,7 +9,10 @@ declare module "fastify" {
     tenantId?: string;
     isAdmin?: boolean;
     /** Runs `fn` inside a transaction with `SET LOCAL app.tenant_id` so RLS policies fire. */
-    withTenant: <T>(fn: (tx: Prisma.TransactionClient) => Promise<T>) => Promise<T>;
+    withTenant: <T>(
+      fn: (tx: Prisma.TransactionClient) => Promise<T>,
+      opts?: { timeout?: number },
+    ) => Promise<T>;
   }
 }
 
@@ -24,21 +27,24 @@ const plugin: FastifyPluginAsync = async (app) => {
   app.decorateRequest("withTenant", null as any);
 
   app.addHook("onRequest", async (req: FastifyRequest) => {
-    req.withTenant = async (fn) => {
+    req.withTenant = async (fn, opts) => {
       if (!req.tenantId && !req.isAdmin) {
         throw new Error("tenant context not set");
       }
-      return prisma.$transaction(async (tx) => {
-        if (req.isAdmin) {
-          adminBypassTotal.labels("tenant-context").inc();
-          await tx.$executeRawUnsafe(`SET LOCAL app.is_admin = 'true'`);
-        }
-        if (req.tenantId) {
-          // uuid cast; Prisma escapes the bound param
-          await tx.$executeRaw`SELECT set_config('app.tenant_id', ${req.tenantId}, true)`;
-        }
-        return fn(tx);
-      });
+      return prisma.$transaction(
+        async (tx) => {
+          if (req.isAdmin) {
+            adminBypassTotal.labels("tenant-context").inc();
+            await tx.$executeRawUnsafe(`SET LOCAL app.is_admin = 'true'`);
+          }
+          if (req.tenantId) {
+            // uuid cast; Prisma escapes the bound param
+            await tx.$executeRaw`SELECT set_config('app.tenant_id', ${req.tenantId}, true)`;
+          }
+          return fn(tx);
+        },
+        opts?.timeout ? { timeout: opts.timeout } : undefined,
+      );
     };
   });
 };

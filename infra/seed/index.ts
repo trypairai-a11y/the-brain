@@ -54,7 +54,7 @@ async function issueApiKey(tenantId: string, slug: string) {
       keyHash: hash,
       keyPrefix: raw.slice(0, 12),
       label: "Seed bot key",
-      scopes: ["read:kb", "write:analytics"],
+      scopes: ["read:kb", "write:analytics", "ops:read", "ops:write"],
     },
     update: {},
   });

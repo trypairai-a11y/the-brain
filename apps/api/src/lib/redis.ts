@@ -16,7 +16,12 @@ function createRedis(): Redis {
     });
   }
   return new Redis(env.REDIS_URL, {
-    maxRetriesPerRequest: 3,
+    // Fail fast: cache ops are fail-soft everywhere (services/cache.ts safe()),
+    // and some run inside 5s interactive transactions. A down Redis must cost
+    // milliseconds, not multi-second retry cycles.
+    maxRetriesPerRequest: 1,
+    commandTimeout: 500,
+    enableOfflineQueue: false,
     lazyConnect: false,
   });
 }
