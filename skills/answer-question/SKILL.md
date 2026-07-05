@@ -7,21 +7,22 @@ memberships, freeze rules, branches.
 
 1. Extract the distinctive keyword(s) from the message. Drop filler; keep the
    noun that identifies the thing (`برن`, `عرض`, `membership`, coach name).
-2. Call `query`:
 
-```json
-POST /ops/query
-{ "question": "<keyword>", "limit": 5 }
-```
+2. Call `query`. If you know the content type, add `"type":
+"flare_memberships"` etc.: it cuts noise substantially.
 
-If you know the content type, add `"type": "flare_memberships"` etc.: it cuts
-noise substantially. 3. Read `results[].snippet` and `name`. If one result clearly answers, use it.
-If several partially match, call `get_entity` on the best id for full data:
+   ```json
+   POST /ops/query
+   { "question": "<keyword>", "limit": 5 }
+   ```
 
-```json
-POST /ops/get_entity
-{ "id": "<result id>" }
-```
+3. Read `results[].snippet` and `name`. If one result clearly answers, use it.
+   If several partially match, call `get_entity` on the best id for full data:
+
+   ```json
+   POST /ops/get_entity
+   { "id": "<result id>" }
+   ```
 
 4. Answer in the customer's language, short, with the concrete fact (price,
    time, name). One fact per sentence.
@@ -34,10 +35,10 @@ POST /ops/get_entity
   a discount percentage, or a schedule. Then `capture` the gap so content gets
   fixed:
 
-```json
-POST /ops/capture
-{ "text": "Customer asked: <question>. No answer found in the brain.", "hint_type": "content-gap" }
-```
+  ```json
+  POST /ops/capture
+  { "text": "Customer asked: <question>. No answer found in the brain.", "hint_type": "content-gap" }
+  ```
 
 ## Rules
 
