@@ -1,8 +1,10 @@
 import type { FastifyPluginAsync } from "fastify";
 import { randomBytes, createHash } from "node:crypto";
+import { Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { ModuleSchema, Role } from "../../../../packages/shared/src/index.js";
+import { conflict } from "../lib/errors.js";
 import { MARKETPLACE } from "../services/marketplace.js";
 
 const CreateTenantBody = z.object({
@@ -58,20 +60,53 @@ const routes: FastifyPluginAsync = async (app) => {
   app.post("/users", async (req) => {
     const body = CreateUserBody.parse(req.body);
     const hash = await bcrypt.hash(body.password, 10);
+    try {
+      const user = await req.withTenant((tx) =>
+        tx.user.create({
+          data: {
+            tenantId: body.tenantId,
+            email: body.email,
+            name: body.name,
+            role: body.role,
+            passwordHash: hash,
+          },
+        }),
+      );
+      return {
+        success: true,
+        data: { id: user.id, email: user.email, name: user.name, role: user.role },
+      };
+    } catch (err) {
+      // Unique (tenantId, email) violation -> a clean 409 the provisioner treats
+      // as "already exists" instead of a 500.
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+        throw conflict(`A user with email ${body.email} already exists in this tenant`);
+      }
+      throw err;
+    }
+  });
+
+  // Admin password reset for a team member (e.g. lockout). Pass newPassword, or
+  // omit it to have one generated and returned once. There is no email-based
+  // reset flow yet; this is the operator path.
+  app.post("/users/:id/reset-password", async (req) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    const { newPassword } = z
+      .object({ newPassword: z.string().min(8).optional() })
+      .parse(req.body ?? {});
+    const password = newPassword ?? `tb_${randomBytes(12).toString("base64url")}`;
+    const hash = await bcrypt.hash(password, 10);
     const user = await req.withTenant((tx) =>
-      tx.user.create({
-        data: {
-          tenantId: body.tenantId,
-          email: body.email,
-          name: body.name,
-          role: body.role,
-          passwordHash: hash,
-        },
+      tx.user.update({
+        where: { id },
+        data: { passwordHash: hash },
+        select: { id: true, email: true },
       }),
     );
     return {
       success: true,
-      data: { id: user.id, email: user.email, name: user.name, role: user.role },
+      data: { id: user.id, email: user.email },
+      meta: newPassword ? { reset: true } : { generatedPassword: password, warning: "shown once" },
     };
   });
 
