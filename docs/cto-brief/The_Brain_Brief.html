@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Pair AI. The Brain Engineering Brief</title>
+<style>
+  @font-face { font-family: "Almarai"; font-weight: 400; font-style: normal; src: url("pair_assets/fonts/Almarai-Regular.ttf") format("truetype"); }
+  @font-face { font-family: "Almarai"; font-weight: 700; font-style: normal; src: url("pair_assets/fonts/Almarai-Bold.ttf") format("truetype"); }
+  :root {
+    /* ink ramp */
+    --ink: #0a0a0a;
+    --ink-soft: #262626;
+    --muted: #5a6672;
+    --faint: #8a97a5;
+    /* structure */
+    --rule: #e5ecf2;
+    --hair: #eef2f7;
+    --panel: #f4f8fd;
+    --panel-2: #ebf3fc;
+    --paper: #ffffff;
+    /* brand accent + sequential ramp (locked hue #4d98e2) */
+    --accent: #4d98e2;
+    --accent-ink: #2f6fb0;
+    --a1: #2f6fb0;
+    --a2: #4d98e2;
+    --a3: #79b0ea;
+    --a4: #a9d0f4;
+    --a5: #d0e6fa;
+    /* semantic */
+    --ok: #2f9e6f;
+    --berry: #bf5573;
+    --terra: #cd824f;
+    /* geometry */
+    --page-w: 210mm;
+    --page-h: 297mm;
+    --mx: 20mm;
+    --mt: 16mm;
+    --mb: 20mm;
+    --r-lg: 16px;
+    --r-md: 12px;
+    --r-sm: 8px;
+    --sh-card: none;
+    --sh-soft: none;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "Almarai", sans-serif;
+    color: var(--ink);
+    background: #ecedef;
+    font-size: 10.5pt;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1, "liga" 1, "cv11" 1;
+  }
+  .ar { font-family: "Almarai", "SF Pro Text", sans-serif; direction: rtl; unicode-bidi: isolate; }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  .pages { display: flex; flex-direction: column; align-items: center; gap: 12mm; padding: 14mm 0 22mm; }
+  .page {
+    width: var(--page-w); height: var(--page-h);
+    background: url("pair_assets/page-background.png") center / 100% 100% no-repeat, var(--paper);
+    box-shadow: 0 1px 1px rgba(10,20,40,.04), 0 24px 50px -26px rgba(20,40,70,.24);
+    position: relative; overflow: hidden;
+    padding: var(--mt) var(--mx) var(--mb);
+    display: flex; flex-direction: column;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  /* ---------------- masthead ---------------- */
+  .masthead { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 13mm; }
+  .masthead .left { display: flex; align-items: center; gap: 10px; }
+  .masthead .logo { width: 18px; height: 18px; }
+  .masthead .logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .masthead .divider { color: #c9d3de; font-weight: 300; margin: 0 2px; font-size: 15pt; }
+  .masthead .section-label { font-weight: 700; letter-spacing: -0.005em; font-size: 12pt; color: var(--ink); }
+  .masthead .doc-tag { color: var(--muted); font-size: 10.5pt; white-space: nowrap; }
+  .mh-left { display: flex; align-items: baseline; gap: 11px; }
+  .mh-idx { font-size: 12.5pt; font-weight: 600; color: var(--faint); letter-spacing: -0.01em; }
+  .mh-title { font-size: 12pt; font-weight: 600; letter-spacing: -0.012em; color: var(--ink); }
+  .mh-right { font-size: 8.5pt; color: var(--faint); letter-spacing: .04em; text-transform: uppercase; font-weight: 600; }
+  .mh-right b { color: var(--accent-ink); }
+  .mh-rule { display: none; }
+  .page.cover .masthead, .page.closing .masthead,
+  .page.cover .footer, .page.closing .footer,
+  .page.cover .page-num, .page.closing .page-num { display: none; }
+
+  .body { flex: 1; width: 100%; max-width: 174mm; margin-inline: auto; }
+  .body p { margin: 0 0 11pt; }
+  p.lead { font-size: 12pt; line-height: 1.5; margin-bottom: 18pt; color: var(--ink-soft); max-width: 158mm; letter-spacing: -0.011em; font-weight: 400; }
+  p.lead b, p.lead strong { color: var(--ink); font-weight: 700; }
+  h2.sub { font-size: 11.5pt; font-weight: 700; letter-spacing: -0.005em; color: var(--ink); margin: 26pt 0 9pt; }
+  h2.sub:first-child { margin-top: 0; }
+
+  /* ---------------- cover ---------------- */
+  .cover { justify-content: flex-start; }
+  .cover-top { display: flex; align-items: center; justify-content: space-between; }
+  .cover .wordmark { width: 132px; height: auto; }
+  .cover .client-wordmark { font-size: 12pt; font-weight: 600; letter-spacing: .01em; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+  .cover .eyebrow { margin-top: 60mm; font-size: 10.5pt; color: var(--ink); letter-spacing: .05em; text-transform: uppercase; font-weight: 700; }
+  .cover h1.display { font-size: 34pt; line-height: 1.04; letter-spacing: -0.022em; font-weight: 700; margin: 9mm 0 8mm; max-width: 160mm; }
+  .cover .deck { font-size: 14pt; line-height: 1.4; color: var(--ink-soft); max-width: 130mm; font-weight: 400; }
+  .cover .meta { margin-top: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; padding-top: 12pt; }
+  .cover .meta .m { padding-right: 8mm; }
+  .cover .meta .m + .m { padding-left: 8mm; }
+  .cover .meta .k { font-size: 7.5pt; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); font-weight: 700; margin-bottom: 4pt; }
+  .cover .meta .v { font-size: 9.5pt; color: var(--ink); font-weight: 600; }
+
+  /* ---------------- footer / page number ---------------- */
+  body { counter-reset: pageno; }
+  .page { counter-increment: pageno; }
+  .page.cover, .page.closing { counter-increment: none; }
+  .footer { position: absolute; left: var(--mx); right: var(--mx); bottom: 14mm; display: flex; justify-content: space-between; align-items: center; font-size: 10pt; }
+  .pill { display: inline-flex; align-items: center; padding: 3pt 10pt; border: 1px solid var(--accent); border-radius: 999px; color: var(--accent); background: rgba(255,255,255,.55); font-weight: 500; font-size: 9.5pt; text-decoration: none; }
+  .page-num { position: absolute; left: 50%; bottom: 14mm; transform: translateX(-50%); font-size: 9pt; color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+  .page-num::before { content: counter(pageno, decimal-leading-zero); }
+
+  /* ---------------- stat band ---------------- */
+  .statband { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 9mm; row-gap: 15pt; margin: 18pt 0 2pt; }
+  .statband .s { padding: 0; }
+  .statband .fig { font-size: 30pt; font-weight: 600; letter-spacing: -0.03em; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .statband .fig span { font-size: 0.4em; color: var(--accent); font-weight: 700; margin-left: 1px; letter-spacing: 0; }
+  .statband .lbl { margin-top: 9pt; font-size: 8.6pt; color: var(--muted); line-height: 1.4; }
+  .statband.compact .fig { font-size: 26pt; }
+
+  /* three inline figures (no frame) */
+  .figrow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12mm; margin: 16pt 0 2pt; }
+  .figrow .fig { font-size: 34pt; font-weight: 600; letter-spacing: -0.035em; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .figrow .fig span { font-size: 0.36em; font-weight: 700; margin-left: 1px; }
+  .figrow .lbl { margin-top: 8pt; font-size: 8.6pt; color: var(--muted); line-height: 1.35; max-width: 42mm; }
+
+  /* ---------------- diagram panel ---------------- */
+  .panel { padding: 6pt 0 0; margin: 2pt 0 0; }
+  .panel .plabel { font-size: 7.5pt; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); font-weight: 700; margin-bottom: 8pt; }
+
+  .legend-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9mm; margin-top: 13pt; }
+  .legend-row .c .k { font-size: 9.5pt; font-weight: 700; color: var(--accent-ink); margin-bottom: 3pt; display: flex; align-items: center; gap: 6px; }
+  .legend-row .c .k .n { width: 15px; height: 15px; border-radius: 5px; background: var(--panel-2); color: var(--accent-ink); font-size: 7pt; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
+  .legend-row .c .v { font-size: 8.4pt; color: var(--muted); line-height: 1.4; }
+
+  /* ---------------- scope bar ---------------- */
+  .scope-legend { display: flex; gap: 16px; align-items: center; font-size: 8.6pt; color: var(--muted); margin: 14pt 0 7pt; }
+  .scope-legend .k { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--ink-soft); }
+  .scope-legend .sw { width: 9px; height: 9px; border-radius: 3px; }
+  .scope-legend .r { margin-left: auto; color: var(--faint); font-weight: 500; }
+  .scopebar { display: flex; gap: 4px; height: 30px; }
+  .scopebar .seg { display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 9pt; border-radius: 7px; letter-spacing: .01em; }
+  .scopebar .read { background: var(--a2); flex: 7; }
+  .scopebar .write { background: var(--a3); flex: 6; }
+  .scopebar .admin { background: var(--a4); color: var(--accent-ink); flex: 2; }
+
+  /* op groups */
+  .opgroups { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8mm; margin-top: 18pt; }
+  .opgroup { padding: 0; }
+  .opgroup .head { font-size: 7.8pt; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-bottom: 9pt; display: flex; align-items: center; justify-content: space-between; }
+  .opgroup .head .n { background: var(--panel-2); border-radius: 20px; padding: 1px 8px; color: var(--accent-ink); }
+  .opgroup .head.sub2 { margin-top: 15pt; }
+  .opchip { display: flex; align-items: baseline; gap: 7px; margin-bottom: 7pt; }
+  .opchip:last-child { margin-bottom: 0; }
+  .opchip .mono { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 8.4pt; color: var(--accent-ink); font-weight: 600; }
+  .opchip .d { color: var(--faint); font-size: 7.8pt; }
+  .opchip.plain { color: var(--ink-soft); font-size: 8.8pt; }
+  .opchip.plain::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--a4); flex: none; align-self: center; }
+
+  /* caps icon grid */
+  .caps { display: grid; grid-template-columns: 1fr 1fr; gap: 16pt 9mm; margin-top: 14pt; }
+  .caps.cards .cap { padding: 0; }
+  .caps .cap { display: flex; flex-direction: column; }
+  .caps .cap .cap-ic { width: 20px; height: 20px; margin-bottom: 8pt; }
+  .caps .cap .cap-ic svg { width: 19px; height: 19px; stroke: var(--accent-ink); fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .caps .cap h3 { font-size: 10pt; font-weight: 700; color: var(--ink); margin: 0 0 3pt; letter-spacing: -0.006em; }
+  .caps .cap h3 .step { color: var(--accent); }
+  .caps .cap p { font-size: 9pt; color: var(--muted); line-height: 1.45; margin: 0; }
+  .caps .cap p code, .body code { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 8.4pt; color: var(--accent-ink); }
+
+  /* signal cards */
+  .signal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8mm; margin: 14pt 0 0; }
+  .sig-card { padding: 0; }
+  .sig-card .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10pt; }
+  .sig-card .name { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 9.5pt; font-weight: 600; }
+  .sig-card.complaint .name { color: var(--berry); } .sig-card.churn .name { color: var(--terra); } .sig-card.sales .name { color: var(--accent-ink); }
+  .sig-card .cnt { font-size: 7.5pt; color: var(--faint); letter-spacing: .06em; text-transform: uppercase; font-weight: 700; }
+  .sig-card .kw { display: flex; flex-wrap: wrap; gap: 5px; }
+  .sig-card .kw span { font-size: 11pt; background: var(--panel); border-radius: 6px; padding: 2px 9px; color: var(--ink-soft); }
+
+  /* gauges */
+  .gauges { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm 12mm; margin-top: 16pt; }
+  .gauge { padding: 0; }
+  .gauge .glabel { display: flex; justify-content: space-between; align-items: baseline; font-size: 9pt; margin-bottom: 8pt; }
+  .gauge .glabel .g-k { font-weight: 700; color: var(--ink); }
+  .gauge .glabel .g-v { font-size: 8.4pt; font-weight: 600; color: var(--accent-ink); }
+  .gauge .track { height: 8px; border-radius: 6px; background: var(--panel-2); overflow: hidden; }
+  .gauge .fill { height: 100%; border-radius: 6px; background: var(--accent); }
+  .gauge .fill.low { background: var(--a4); }
+  .gauge .note { font-size: 8pt; color: var(--muted); margin-top: 8pt; line-height: 1.4; }
+
+  /* security layers (funnel) */
+  .layers { margin-top: 14pt; display: flex; flex-direction: column; gap: 0; }
+  .layer { display: grid; grid-template-columns: 26px 1fr; gap: 12px; align-items: center; padding: 6pt 0; }
+  .layer.l1, .layer.l2, .layer.l3, .layer.l4 { background: none; width: 100%; }
+  .layer .ic { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
+  .layer .ic svg { width: 16px; height: 16px; stroke: var(--accent-ink); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .layer .t { font-size: 9pt; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .layer .t b { font-weight: 700; color: var(--ink); } .layer .t .s { color: var(--muted); }
+  .layer-target { text-align: center; font-size: 8.4pt; color: var(--accent-ink); font-weight: 700; letter-spacing: .05em; margin-top: 6pt; }
+
+  /* roadmap status board */
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9mm; margin-top: 14pt; }
+  .col { border-top: 2px solid var(--rule); padding-top: 11pt; }
+  .col.live { border-color: var(--ok); }
+  .col.next { border-color: var(--accent); }
+  .col.later { border-color: #c9d3de; }
+  .col-head { display: flex; align-items: baseline; gap: 8px; font-size: 8pt; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; margin-bottom: 13pt; }
+  .col.live .col-head { color: var(--ok); }
+  .col.next .col-head { color: var(--accent-ink); }
+  .col.later .col-head { color: var(--muted); }
+  .col-head .n { margin-left: auto; color: var(--faint); font-weight: 600; }
+  .col .item { margin-bottom: 13pt; }
+  .col .item:last-child { margin-bottom: 0; }
+  .col .item .nm { font-size: 10pt; font-weight: 700; color: var(--ink); letter-spacing: -0.004em; }
+  .col .item .sub { font-size: 8.4pt; color: var(--muted); margin-top: 2pt; line-height: 1.35; }
+
+  /* verify checklist */
+  .verify { display: grid; grid-template-columns: 1fr 1fr; gap: 7pt 12mm; margin-top: 12pt; }
+  .vitem { display: grid; grid-template-columns: 17px 1fr; gap: 9px; align-items: start; font-size: 9pt; color: var(--ink-soft); line-height: 1.4; }
+  .vitem .ck { width: 13px; height: 13px; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+  .vitem .ck svg { width: 9px; height: 9px; stroke: var(--ok); fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* note strip */
+  .note { margin-top: 14pt; padding: 0; font-size: 9pt; color: var(--ink-soft); line-height: 1.5; }
+  .note .tag { display: block; font-size: 7.5pt; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--accent-ink); margin-bottom: 4pt; }
+  .note.warn .tag { color: var(--terra); }
+  .note b { color: var(--ink); font-weight: 700; }
+
+  /* closing */
+  .closing { align-items: center; justify-content: center; text-align: center; }
+  .closing .wordmark { width: 128px; margin: 0 auto 12mm; }
+  .closing .c-rule { display: none; }
+  .closing h2 { font-size: 22pt; font-weight: 600; letter-spacing: -0.022em; line-height: 1.22; margin: 0 0 7mm; max-width: 148mm; }
+  .closing p { font-size: 11pt; color: var(--muted); max-width: 128mm; margin: 0 auto; line-height: 1.5; }
+  .closing .tagline { margin-top: 14mm; font-size: 10.5pt; color: var(--accent-ink); font-weight: 700; letter-spacing: .01em; }
+
+  ol.next { margin: 6pt 0 0; padding: 0; list-style: none; counter-reset: step; }
+  ol.next li { counter-increment: step; position: relative; padding-left: 34px; margin-bottom: 11pt; font-size: 9.5pt; color: var(--ink-soft); line-height: 1.55; }
+  ol.next li:last-child { margin-bottom: 0; }
+  ol.next li::before { content: counter(step); position: absolute; left: 0; top: 0; background: var(--accent); color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8.5pt; font-weight: 700; }
+
+  @page { size: A4; margin: 0; }
+  @media print {
+    body { background: var(--paper); }
+    .pages { gap: 0; padding: 0; }
+    .page { box-shadow: none; break-after: page; page-break-after: always; }
+    .page:last-child { break-after: auto; page-break-after: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="pages">
+
+  <!-- ==================== COVER ==================== -->
+  <section class="page cover">
+    <div class="cover-top">
+      <img class="wordmark" src="pair_assets/pair-wordmark.svg" alt="Pair AI">
+      <div class="client-wordmark">The Brain</div>
+    </div>
+
+    <div class="eyebrow">Engineering Brief</div>
+    <h1 class="display">The memory behind the agent.</h1>
+    <p class="deck">A multi-tenant knowledge hub. Staff feed it, the AI agent serves it live, and every conversation flows back as memory. Built for Flare Fitness. Live in production.</p>
+
+    <div class="meta">
+      <div class="m"><div class="k">Prepared for</div><div class="v">The CTO</div></div>
+      <div class="m"><div class="k">Status</div><div class="v">Live in production</div></div>
+      <div class="m"><div class="k">Endpoint</div><div class="v">brain-flare.vercel.app</div></div>
+      <div class="m"><div class="k">Date</div><div class="v">July 2026</div></div>
+    </div>
+  </section>
+
+  <!-- ==================== 01 WHAT IT IS ==================== -->
+  <section class="page">
+    <header class="masthead"><div class="left"><span class="logo"><img src="pair_assets/pair-icon.png" alt="Pair"></span><span class="divider">|</span><span class="section-label">What it is</span></div><span class="doc-tag">The Brain</span></header>
+    <div class="body">
+      <p class="lead">The Brain holds a customer's business knowledge, structured and versioned, and serves it live to the AI agent that answers their customers. For Flare Fitness that agent is <b>FAI</b>, on WhatsApp and Instagram, in Kuwaiti Arabic.</p>
+
+      <div class="statband">
+        <div class="s"><div class="fig">2</div><div class="lbl">Halves of one loop, both live: humans feed, agents serve and file back</div></div>
+        <div class="s"><div class="fig">15</div><div class="lbl">Named agent operations at one self-describing endpoint</div></div>
+        <div class="s"><div class="fig">623<span>+</span></div><div class="lbl">Live knowledge entries across 19 typed modules</div></div>
+        <div class="s"><div class="fig">94<span>k</span></div><div class="lbl">Flare conversation threads the system learns from</div></div>
+        <div class="s"><div class="fig">0</div><div class="lbl">Tokens spent detecting complaints and churn signals</div></div>
+        <div class="s"><div class="fig">100<span>%</span></div><div class="lbl">Tenant isolation enforced in Postgres, not app code</div></div>
+      </div>
+
+      <div class="note">
+        <span class="tag">The shape of it</span>
+        Staff feed structured knowledge. The agent serves it live, then files each conversation back as typed memory. The archive stops being dead storage and starts working.
+      </div>
+      <div class="note warn">
+        <span class="tag">One action item</span>
+        The production admin account still carries seeded credentials on a public URL. <b>Rotate it.</b> Everything else on the list is a planned upgrade, not a defect.
+      </div>
+    </div>
+    <div class="footer"><a class="pill" href="https://instagram.com/trypair">@trypair</a><a class="pill" href="mailto:ask@trypair.ai">ask@trypair.ai</a></div>
+    <div class="page-num"></div>
+  </section>
+
+  <!-- ==================== 02 THE LOOP ==================== -->
+  <section class="page">
+    <header class="masthead"><div class="left"><span class="logo"><img src="pair_assets/pair-icon.png" alt="Pair"></span><span class="divider">|</span><span class="section-label">The loop</span></div><span class="doc-tag">The Brain</span></header>
+    <div class="body">
+      <p class="lead">An agent with no memory treats every conversation as the first. The Brain closes the loop, in four stages.</p>
+
+      <div class="panel">
+        <div class="plabel">The knowledge loop</div>
+        <svg viewBox="0 0 620 292" width="100%" xmlns="http://www.w3.org/2000/svg" style="display:block">
+          <defs>
+            <marker id="ar" markerWidth="8" markerHeight="8" refX="5.5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4d98e2"/></marker>
+            <radialGradient id="core" cx="50%" cy="38%" r="70%"><stop offset="0%" stop-color="#1c2a3c"/><stop offset="100%" stop-color="#0a0a0a"/></radialGradient>
+            <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="2.5" stdDeviation="4.5" flood-color="#12365c" flood-opacity="0.16"/></filter>
+          </defs>
+          <circle cx="310" cy="146" r="56" fill="#0a0a0a"/>
+          <text x="310" y="141" text-anchor="middle" fill="#fff" font-size="15" font-weight="700" font-family="SF Pro Display, sans-serif">The Brain</text>
+          <text x="310" y="160" text-anchor="middle" fill="#79b0ea" font-size="9" font-family="SF Pro Display, sans-serif">system of record</text>
+
+          <g font-family="SF Pro Display, sans-serif">
+            <g>
+              <rect x="230" y="12" width="160" height="50" rx="13" fill="#fff" stroke="#dbe7f4" stroke-width="1"/>
+              <rect x="440" y="121" width="164" height="50" rx="13" fill="#fff" stroke="#dbe7f4" stroke-width="1"/>
+              <rect x="230" y="230" width="160" height="50" rx="13" fill="#fff" stroke="#dbe7f4" stroke-width="1"/>
+              <rect x="16" y="121" width="164" height="50" rx="13" fill="#fff" stroke="#dbe7f4" stroke-width="1"/>
+            </g>
+            <g><circle cx="248" cy="30" r="9" fill="#eaf3fd"/><text x="248" y="33.5" text-anchor="middle" font-size="9" font-weight="700" fill="#2f6fb0">1</text>
+               <text x="272" y="30" font-size="12" font-weight="700" fill="#0a0a0a">Feed</text><text x="272" y="48" font-size="8.5" fill="#64707d">Staff edit typed knowledge</text></g>
+            <g><circle cx="459" cy="139" r="9" fill="#eaf3fd"/><text x="459" y="142.5" text-anchor="middle" font-size="9" font-weight="700" fill="#2f6fb0">2</text>
+               <text x="483" y="139" font-size="12" font-weight="700" fill="#0a0a0a">Serve</text><text x="483" y="157" font-size="8.5" fill="#64707d">FAI quotes it, live and exact</text></g>
+            <g><circle cx="248" cy="248" r="9" fill="#eaf3fd"/><text x="248" y="251.5" text-anchor="middle" font-size="9" font-weight="700" fill="#2f6fb0">3</text>
+               <text x="272" y="248" font-size="12" font-weight="700" fill="#0a0a0a">Capture</text><text x="272" y="266" font-size="8.5" fill="#64707d">Threads filed back as memory</text></g>
+            <g><circle cx="35" cy="139" r="9" fill="#eaf3fd"/><text x="35" y="142.5" text-anchor="middle" font-size="9" font-weight="700" fill="#2f6fb0">4</text>
+               <text x="59" y="139" font-size="12" font-weight="700" fill="#0a0a0a">Surface</text><text x="59" y="157" font-size="8.5" fill="#64707d">Daily owner briefing</text></g>
+          </g>
+
+          <g fill="none" stroke="#4d98e2" stroke-width="2">
+            <path d="M391,40 A152,152 0 0 1 505,116" marker-end="url(#ar)"/>
+            <path d="M520,175 A152,152 0 0 1 391,254" marker-end="url(#ar)"/>
+            <path d="M229,258 A152,152 0 0 1 104,175" marker-end="url(#ar)"/>
+            <path d="M92,118 A152,152 0 0 1 229,38" marker-end="url(#ar)"/>
+          </g>
+        </svg>
+        <div class="legend-row">
+          <div class="c"><div class="k"><span class="n">1</span>Feed</div><div class="v">A React dashboard. 19 modules, 623+ typed entries, every change versioned.</div></div>
+          <div class="c"><div class="k"><span class="n">2</span>Serve</div><div class="v">FAI reads knowledge on nearly every message and never invents a price.</div></div>
+          <div class="c"><div class="k"><span class="n">3</span>Capture</div><div class="v">One call files the customer, the transcript, and the detected signals.</div></div>
+          <div class="c"><div class="k"><span class="n">4</span>Surface</div><div class="v">Accumulated memory becomes an early-warning digest the owner feels.</div></div>
+        </div>
+      </div>
+
+      <div class="note">
+        <span class="tag">Before the Brain</span>
+        Prices lived in people's heads, so the agent went stale the moment they changed. Every finished conversation vanished. A member could complain on Monday and be a stranger by Thursday.
+      </div>
+    </div>
+    <div class="footer"><a class="pill" href="https://instagram.com/trypair">@trypair</a><a class="pill" href="mailto:ask@trypair.ai">ask@trypair.ai</a></div>
+    <div class="page-num"></div>
+  </section>
+
+  <!-- ==================== 03 ARCHITECTURE ==================== -->
+  <section class="page">
+    <header class="masthead"><div class="left"><span class="logo"><img src="pair_assets/pair-icon.png" alt="Pair"></span><span class="divider">|</span><span class="section-label">Architecture</span></div><span class="doc-tag">The Brain</span></header>
+    <div class="body">
+      <p class="lead">A pnpm monorepo: a Fastify API in front of Postgres, a React dashboard, a prompts package. Deliberately conventional, so the interesting parts stay legible.</p>
+
+      <div class="panel">
+        <div class="plabel">System topology</div>
+        <svg viewBox="0 0 620 336" width="100%" xmlns="http://www.w3.org/2000/svg" style="display:block">
+          <defs>
+            <marker id="a2" markerWidth="8" markerHeight="8" refX="5.5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4d98e2"/></marker>
+            <linearGradient id="fai" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c2a3c"/><stop offset="100%" stop-color="#0a0a0a"/></linearGradient>
+            <filter id="soft2" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#12365c" flood-opacity="0.14"/></filter>
+          </defs>
+          <g font-family="SF Pro Display, sans-serif">
+            <g>
+              <rect x="40" y="10" width="230" height="52" rx="12" fill="#0a0a0a"/>
+              <rect x="350" y="10" width="230" height="52" rx="12" fill="#fff" stroke="#dbe7f4"/>
+            </g>
+            <text x="155" y="33" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">FAI on WhatsApp / Instagram</text>
+            <text x="155" y="49" text-anchor="middle" fill="#79b0ea" font-size="8.5">tb_live_ API key</text>
+            <text x="465" y="33" text-anchor="middle" fill="#0a0a0a" font-size="11.5" font-weight="700">Dashboard on React / Vite</text>
+            <text x="465" y="49" text-anchor="middle" fill="#64707d" font-size="8.5">JWT session</text>
+
+            <g fill="none" stroke="#4d98e2" stroke-width="2">
+              <path d="M155,62 L155,92 L302,92 L302,114" marker-end="url(#a2)"/>
+              <path d="M465,62 L465,92 L318,92 L318,114" marker-end="url(#a2)"/>
+            </g>
+
+            <g><rect x="66" y="116" width="488" height="90" rx="14" fill="#f4f9ff" stroke="#dbe7f4" stroke-width="1.2"/></g>
+            <text x="310" y="137" text-anchor="middle" fill="#0a0a0a" font-size="12" font-weight="700">Fastify API</text>
+            <g font-size="8.5" fill="#2f6fb0" font-weight="600">
+              <rect x="86" y="149" width="118" height="19" rx="9.5" fill="#fff" stroke="#d3e2f3"/><text x="145" y="162" text-anchor="middle">dual auth</text>
+              <rect x="214" y="149" width="118" height="19" rx="9.5" fill="#fff" stroke="#d3e2f3"/><text x="273" y="162" text-anchor="middle">Zod validation</text>
+              <rect x="342" y="149" width="118" height="19" rx="9.5" fill="#fff" stroke="#d3e2f3"/><text x="401" y="162" text-anchor="middle">rate limits</text>
+              <rect x="470" y="149" width="64" height="19" rx="9.5" fill="#fff" stroke="#d3e2f3"/><text x="502" y="162" text-anchor="middle">audit</text>
+              <rect x="120" y="174" width="150" height="19" rx="9.5" fill="#fff" stroke="#d3e2f3"/><text x="195" y="187" text-anchor="middle">15 ops registry</text>
+              <rect x="278" y="174" width="182" height="19" rx="9.5" fill="#fff" stroke="#d3e2f3"/><text x="369" y="187" text-anchor="middle">pino, metrics, Sentry</text>
+            </g>
+
+            <path d="M310,206 L310,232" fill="none" stroke="#4d98e2" stroke-width="2" marker-end="url(#a2)"/>
+            <g><rect x="186" y="210" width="248" height="20" rx="10" fill="#0a0a0a"/></g>
+            <text x="310" y="224" text-anchor="middle" fill="#79b0ea" font-size="8.5" font-weight="700">SET LOCAL app.tenant_id → RLS fires</text>
+
+            <g><rect x="66" y="244" width="488" height="80" rx="14" fill="#fff" stroke="#dbe7f4"/></g>
+            <text x="310" y="266" text-anchor="middle" fill="#0a0a0a" font-size="12" font-weight="700">Postgres, Neon (Frankfurt), RLS + pg_trgm</text>
+            <g font-size="8.7">
+              <text x="150" y="295" text-anchor="middle" fill="#64707d">modules</text>
+              <text x="238" y="295" text-anchor="middle" fill="#64707d">entries</text>
+              <text x="345" y="295" text-anchor="middle" fill="#2f6fb0" font-weight="700">entity_links</text>
+              <text x="460" y="295" text-anchor="middle" fill="#2f6fb0" font-weight="700">entity_events</text>
+              <text x="310" y="312" text-anchor="middle" font-size="7.6" fill="#98a3ae">two tables added for the operations layer, everything else reused</text>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <div class="caps cards" style="margin-top:14pt">
+        <div class="cap"><div class="cap-ic"><svg viewBox="0 0 24 24"><path d="m7 8-4 4 4 4"/><path d="m17 8 4 4-4 4"/><path d="M14 4l-4 16"/></svg></div><h3>One catchall on Vercel</h3><p>Bracket files match a single path segment, so all routing re-injects into the full Fastify app through <code>api/v1/catchall.ts</code>.</p></div>
+        <div class="cap"><div class="cap-ic"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg></div><h3>Redis is optional</h3><p>The cache client stubs to no-ops when unset and fails fast when down. The system runs correctly with no Redis at all.</p></div>
+        <div class="cap"><div class="cap-ic"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><h3>Contract defined once</h3><p><code>packages/shared</code> holds the Zod schemas used by both API and web, so the data contract is written in exactly one place.</p></div>
+        <div class="cap"><div class="cap-ic"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><h3>External keys parked</h3><p>Anthropic, OpenAI, SMTP, and R2 carry placeholders. The features needing them are deferred, not broken.</p></div>
+      </div>
+    </div>
+    <div class="footer"><a class="pill" href="https://instagram.com/trypair">@trypair</a><a class="pill" href="mailto:ask@trypair.ai">ask@trypair.ai</a></div>
+    <div class="page-num"></div>
+  </section>
+
+  <!-- ==================== 04 OPERATIONS ==================== -->
+  <section class="page">
+    <header class="masthead"><div class="left"><span class="logo"><img src="pair_assets/pair-icon.png" alt="Pair"></span><span class="divider">|</span><span class="section-label">The operations layer</span></div><span class="doc-tag">The Brain</span></header>
+    <div class="body">
+      <p class="lead">One file defines every operation: name, scope, params, handler. The REST routes, permissions, and docs all follow from it. This is how the agent talks to the Brain.</p>
+
+      <div class="scope-legend">
+        <span class="k"><span class="sw" style="background:var(--a2)"></span>read 7</span>
+        <span class="k"><span class="sw" style="background:var(--a3)"></span>write 6</span>
+        <span class="k"><span class="sw" style="background:var(--a4)"></span>admin 2</span>
+        <span class="r">15 operations, scoped read &lt; write &lt; admin</span>
+      </div>
+      <div class="scopebar">
+        <div class="seg read">7 read</div>
+        <div class="seg write">6 write</div>
+        <div class="seg admin">2</div>
+      </div>
+
+      <div class="opgroups">
+        <div class="opgroup">
+          <div class="head">Read <span class="n">7</span></div>
+          <div class="opchip"><span class="mono">query</span><span class="d">every message</span></div>
+          <div class="opchip"><span class="mono">get_entity</span></div>
+          <div class="opchip"><span class="mono">list_entities</span></div>
+          <div class="opchip"><span class="mono">graph_query</span></div>
+          <div class="opchip"><span class="mono">timeline</span></div>
+          <div class="opchip"><span class="mono">daily_briefing</span></div>
+          <div class="opchip"><span class="mono">health</span></div>
+        </div>
+        <div class="opgroup">
+          <div class="head">Write <span class="n">6</span></div>
+          <div class="opchip"><span class="mono">ingest_conversation</span></div>
+          <div class="opchip"><span class="mono">upsert_entity</span></div>
+          <div class="opchip"><span class="mono">capture</span></div>
+          <div class="opchip"><span class="mono">link_entities</span></div>
+          <div class="opchip"><span class="mono">log_event</span></div>
+          <div class="opchip"><span class="mono">set_status</span></div>
+        </div>
+        <div class="opgroup">
+          <div class="head">Admin <span class="n">2</span></div>
+          <div class="opchip"><span class="mono">schema</span><span class="d">no agent keys</span></div>
+          <div class="opchip"><span class="mono">reindex</span></div>
+          <div class="head sub2">Guardrails</div>
+          <div class="opchip plain">No cross-tenant ops</div>
+          <div class="opchip plain">No raw SQL for agents</div>
+          <div class="opchip plain">No untyped writes</div>
+        </div>
+      </div>
+
+      <h2 class="sub">What every call passes through</h2>
+      <div class="caps cards">
+        <div class="cap"><div class="cap-ic"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><h3><span class="step">1</span> Auth</h3><p><code>tb_live_</code> keys hit a SHA-256 lookup with revocation and expiry. Otherwise JWT.</p></div>
+        <div class="cap"><div class="cap-ic"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div><h3><span class="step">2</span> Scope</h3><p>read, write, or admin. Agent keys never reach admin. A 403 names the missing scope.</p></div>
+        <div class="cap"><div class="cap-ic"><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></div><h3><span class="step">3</span> Validate + tenancy</h3><p>Zod checks params, then the handler runs inside the tenant transaction with RLS active.</p></div>
+        <div class="cap"><div class="cap-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h6"/></svg></div><h3><span class="step">4</span> Audit</h3><p>Every write and admin call writes an <code>audit_log</code> row, payloads truncated to counts.</p></div>
+      </div>
+    </div>
+    <div class="footer"><a class="pill" href="https://instagram.com/trypair">@trypair</a><a class="pill" href="mailto:ask@trypair.ai">ask@trypair.ai</a></div>
+    <div class="page-num"></div>
+  </section>
+
+  <!-- ==================== 05 MEMORY + SIGNALS ==================== -->
+  <section class="page">
+    <header class="masthead"><div class="left"><span class="logo"><img src="pair_assets/pair-icon.png" alt="Pair"></span><span class="divider">|</span><span class="section-label">Memory &amp; signals</span></div><span class="doc-tag">The Brain</span></header>
+    <div class="body">
+      <p class="lead">One <code>ingest_conversation</code> call files a finished thread. In one transaction: upsert the customer, store the transcript, link them, log events, detect signals.</p>
+
+      <h2 class="sub">Three signals, detected on Kuwaiti Arabic</h2>
+      <div class="signal-grid">
+        <div class="sig-card complaint">
+          <div class="top"><span class="name">complaint</span><span class="cnt">keyword</span></div>
+          <div class="kw"><span class="ar">مشكلة</span><span class="ar">ما اشتغل</span><span class="ar">استرجاع</span></div>
+        </div>
+        <div class="sig-card churn">
+          <div class="top"><span class="name">churn_risk</span><span class="cnt">keyword</span></div>
+          <div class="kw"><span class="ar">الغاء</span><span class="ar">بطل الاشتراك</span></div>
+        </div>
+        <div class="sig-card sales">
+          <div class="top"><span class="name">sales_intent</span><span class="cnt">keyword</span></div>
+          <div class="kw"><span class="ar">سعر</span><span class="ar">خصم</span><span class="ar">كود</span></div>
+        </div>
+      </div>
+
+      <h2 class="sub">Deliberately tuned high-precision</h2>
+      <div class="gauges">
+        <div class="gauge">
+          <div class="glabel"><span class="g-k">Precision</span><span class="g-v">high</span></div>
+          <div class="track"><div class="fill" style="width:94%"></div></div>
+          <div class="note" style="margin-top:8pt;border:none;padding:0;box-shadow:none;background:none">A false complaint alert erodes the owner's trust in the morning briefing.</div>
+        </div>
+        <div class="gauge">
+          <div class="glabel"><span class="g-k">Recall</span><span class="g-v">low, on purpose</span></div>
+          <div class="track"><div class="fill low" style="width:46%"></div></div>
+          <div class="note" style="margin-top:8pt;border:none;padding:0;box-shadow:none;background:none">A missed signal is recoverable. When we want recall, an LLM pass slots in behind the same contract.</div>
+        </div>
+      </div>
+
+      <div class="figrow" style="margin-top:22pt">
+        <div><div class="fig">0</div><div class="lbl">Tokens per detection</div></div>
+        <div><div class="fig">0<span>ms</span></div><div class="lbl">Added latency</div></div>
+        <div><div class="fig">0</div><div class="lbl">Hallucinated complaints, ever</div></div>
+      </div>
+
+      <div class="note">
+        <span class="tag">Real production result</span>
+        A real thread, a 33% code that applied as 10%: customer upserted, <b>escalated: true</b>, signals <b>[complaint, sales_intent]</b>. Re-ingesting the same thread returns the same ids. Idempotent.
+      </div>
+    </div>
+    <div class="footer"><a class="pill" href="https://instagram.com/trypair">@trypair</a><a class="pill" href="mailto:ask@trypair.ai">ask@trypair.ai</a></div>
+    <div class="page-num"></div>
+  </section>
+
+  <!-- ==================== 06 SECURITY ==================== -->
+  <section class="page">
+    <header class="masthead"><div class="left"><span class="logo"><img src="pair_assets/pair-icon.png" alt="Pair"></span><span class="divider">|</span><span class="section-label">Security</span></div><span class="doc-tag">The Brain</span></header>
+    <div class="body">
+      <p class="lead">Tenant isolation lives in the database, not in application code. Defense in depth, from the edge to the row.</p>
+
+      <div class="layers">
+        <div class="layer l1">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="t"><b>Edge.</b> <span class="s">Helmet CSP and HSTS, per-route rate limits, constant-time login throttle.</span></div>
+        </div>
+        <div class="layer l2">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <div class="t"><b>Auth.</b> <span class="s">JWT for users, tb_live_ keys for agents, SHA-256 hashed, least-privilege.</span></div>
+        </div>
+        <div class="layer l3">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="t"><b>Validation + tenancy.</b> <span class="s">Zod on every handler, FORCE ROW LEVEL SECURITY on every table, no BYPASSRLS.</span></div>
+        </div>
+        <div class="layer l4">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+          <div class="t"><b>Audit.</b> <span class="s">Every write and admin call logged with operation name and truncated params.</span></div>
+        </div>
+        <div class="layer-target">a buggy query cannot see another tenant's rows</div>
+      </div>
+
+      <div class="note warn">
+        <span class="tag">Action required, today</span>
+        The production <code>PAIR_ADMIN</code> account still carries the seeded credentials from <code>infra/seed/</code>, on a public URL, and can mint API keys for any tenant. <b>Rotate it now, with the seeded editor account.</b>
+      </div>
+
+      <h2 class="sub">Supply chain and hygiene</h2>
+      <div class="verify">
+        <div class="vitem"><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>Gitleaks secret scan on every push</div>
+        <div class="vitem"><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span><code>pnpm audit</code> at high severity on every push</span></div>
+        <div class="vitem"><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>Coverage thresholds ratchet up in CI</div>
+        <div class="vitem"><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>Runbooks: auth, RLS leak, DB failover, LLM outage</div>
+      </div>
+    </div>
+    <div class="footer"><a class="pill" href="https://instagram.com/trypair">@trypair</a><a class="pill" href="mailto:ask@trypair.ai">ask@trypair.ai</a></div>
+    <div class="page-num"></div>
+  </section>
+
+  <!-- ==================== 07 STATUS & ROADMAP ==================== -->
+  <section class="page">
+    <header class="masthead"><div class="left"><span class="logo"><img src="pair_assets/pair-icon.png" alt="Pair"></span><span class="divider">|</span><span class="section-label">Status &amp; roadmap</span></div><span class="doc-tag">The Brain</span></header>
+    <div class="body">
+      <p class="lead">What is live, what is next, and what comes later. Every limit has a contained upgrade path.</p>
+
+      <div class="board">
+        <div class="col live">
+          <div class="col-head">Live now<span class="n">3</span></div>
+          <div class="item"><div class="nm">Both halves of the loop</div><div class="sub">feed + serve + capture</div></div>
+          <div class="item"><div class="nm">15 operations + RLS</div><div class="sub">contract-first, audited</div></div>
+          <div class="item"><div class="nm">Arabic signal detection</div><div class="sub">keyword, high-precision</div></div>
+        </div>
+        <div class="col next">
+          <div class="col-head">Next<span class="n">2</span></div>
+          <div class="item"><div class="nm">Vector retrieval</div><div class="sub">pgvector + embeddings, Kuwaiti dialect</div></div>
+          <div class="item"><div class="nm">Seed cleanup + timezone</div><div class="sub">small, isolated fixes</div></div>
+        </div>
+        <div class="col later">
+          <div class="col-head">Later<span class="n">2</span></div>
+          <div class="item"><div class="nm">LLM signal pass</div><div class="sub">recall, behind same contract</div></div>
+          <div class="item"><div class="nm">MCP surface</div><div class="sub">generated from the same registry</div></div>
+        </div>
+      </div>
+
+      <div class="note">
+        <span class="tag">The one that matters</span>
+        <b>Embeddings first.</b> Retrieval is keyword-only today, so Arabic morphology can miss (اشتراك matches, الاشتراك can slip). It is the one limit a customer feels, and the fix sits behind the <code>query</code> operation the agent already calls.
+      </div>
+
+      <h2 class="sub">Verified on production, with real data</h2>
+      <div class="verify">
+        <div class="vitem"><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>health: 19 modules, 623 active entries</div>
+        <div class="vitem"><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>ingest on a real Kuwaiti-Arabic thread</div>
+        <div class="vitem"><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>graph_query customer to conversation</div>
+        <div class="vitem"><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>daily_briefing full digest</div>
+        <div class="vitem"><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>scope enforcement returns 403 named</div>
+        <div class="vitem"><span class="ck"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>idempotent re-ingest, same ids</div>
+      </div>
+    </div>
+    <div class="footer"><a class="pill" href="https://instagram.com/trypair">@trypair</a><a class="pill" href="mailto:ask@trypair.ai">ask@trypair.ai</a></div>
+    <div class="page-num"></div>
+  </section>
+
+  <!-- ==================== 08 HANDOFF ==================== -->
+  <section class="page">
+    <header class="masthead"><div class="left"><span class="logo"><img src="pair_assets/pair-icon.png" alt="Pair"></span><span class="divider">|</span><span class="section-label">Handoff</span></div><span class="doc-tag">The Brain</span></header>
+    <div class="body">
+      <p class="lead">The system runs on our own stack, git-connected and auto-deploying. Picking it up is a short list.</p>
+
+      <div class="figrow" style="margin-top:2pt">
+        <div><div class="fig">1</div><div class="lbl">Push to <code>main</code> to ship, no CLI ritual</div></div>
+        <div><div class="fig">2</div><div class="lbl">Steps to wire an agent: load resolver, hand it a key</div></div>
+        <div><div class="fig">0</div><div class="lbl">Docker needed for local dev, embedded Postgres boots itself</div></div>
+      </div>
+
+      <h2 class="sub">To pick it up</h2>
+      <div class="panel" style="padding:16pt 18pt">
+        <ol class="next">
+          <li>Clone <code>trypairai-a11y/the-brain</code>, run <code>pnpm dev</code> for the full loop locally against embedded Postgres on port 55433.</li>
+          <li>To ship, push to <code>main</code>. Vercel auto-builds and deploys to <code>brain-flare.vercel.app</code>. Neon Postgres sits in Frankfurt.</li>
+          <li>To wire FAI, load <code>skills/RESOLVER.md</code> into its system prompt and hand it a scoped <code>tb_live_</code> key. The skills already point at production.</li>
+          <li>First, rotate the seeded admin credentials. Then embeddings behind the <code>query</code> operation.</li>
+        </ol>
+      </div>
+
+      <div class="note">
+        <span class="tag">Two-layer design</span>
+        A machine-checkable operations contract underneath, human-readable skills on top. The agent's behavior is reviewed in a pull request, not buried in code.
+      </div>
+
+      <div class="two-latent note">
+        <span class="tag">Two latent bugs found and fixed</span>
+        Arabic POST bodies were 400-ing through the Vercel catchall (stale <code>content-length</code> on multibyte text). A Redis outage could starve the 5-second transaction. Both fixed on <code>main</code>.
+      </div>
+    </div>
+    <div class="footer"><a class="pill" href="https://instagram.com/trypair">@trypair</a><a class="pill" href="mailto:ask@trypair.ai">ask@trypair.ai</a></div>
+    <div class="page-num"></div>
+  </section>
+
+  <!-- ==================== CLOSING ==================== -->
+  <section class="page closing">
+    <img class="wordmark" src="pair_assets/pair-wordmark.svg" alt="Pair AI">
+    <div class="c-rule"></div>
+    <h2>The archive stops being dead storage. It gets smarter every day it runs.</h2>
+    <p>Live in production. One thing to do on the way in: rotate the seeded admin credentials. One thing next: embeddings.</p>
+    <div class="tagline">Built in Kuwait. Paired, not queued.</div>
+  </section>
+
+</div>
+</body>
+</html>
