@@ -18,3 +18,5 @@ coverage
 .claude/
 *.xlsx
 apps/api/.embedded-pg/
+scripts/.tenant-cache.json
+scripts/roster.*.json
